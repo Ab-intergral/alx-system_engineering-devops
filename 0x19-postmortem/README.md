@@ -4,9 +4,9 @@
 <img src="https://miro.medium.com/v2/resize:fit:750/format:webp/1*oVKGoD-vtTaKiEFSknK8bA.jpeg" width=100% height=100% />
 </p>
 
-##Web Server Outage Postmortem: Slow Response Due to Misconfigured Cache
+**Web Server Outage Postmortem: Slow Response Due to Misconfigured Cache**
 
-##Issue Summary:
+**Issue Summary:**
 - **Duration:** July 25, 2023, 10:00 - July 25, 2023, 13:15 (UTC)
 - **Impact:** Users experienced slow page loads and delayed responses, affecting approximately 20% of users.
 - **Service Affected:** Web application's response time.
