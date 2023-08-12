@@ -1,45 +1,44 @@
-Postmortem Report
+##Postmortem Report
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/OliyadKebede/alx-system_engineering-devops/main/0x19-postmortem/report_cover_picture.PNG" width=100% height=100% />
+<img src="https://miro.medium.com/v2/resize:fit:750/format:webp/1*oVKGoD-vtTaKiEFSknK8bA.jpeg" width=100% height=100% />
 </p>
 
-# GitHub services were affected on October 22  post-incident analysis
+##Web Server Outage Postmortem: Slow Response Due to Misconfigured Cache
 
-### Summary
+##Issue Summary:
+- **Duration:** July 25, 2023, 10:00 - July 25, 2023, 13:15 (UTC)
+- **Impact:** Users experienced slow page loads and delayed responses, affecting approximately 20% of users.
+- **Service Affected:** Web application's response time.
 
-GitHub had a problem last week that caused the service to be down for 24 hours and 11 minutes. While certain parts of our platform were not impacted by this incident,
-several internal systems were, which led to the display of outdated and conflicting information. No user data was ultimately lost, however manual reconciliation for a
-brief period of database writes is still ongoing. Additionally, throughout the majority of the incident, GitHub was unable to create and publish GitHub Pages sites or
-provide webhook events.
+**Timeline:**
+- **Detected:** July 25, 2023, 10:00 (UTC)
+- **Detection:** Engineers noticed increased response time and received customer complaints.
+- **Actions Taken:** Initial focus on backend services and server resources.
+- **Misleading Paths:** Explored database performance optimization and network latency.
+- **Escalation:** Incident escalated to Web Operations team.
+- **Resolution:** Misconfigured caching settings identified and corrected, service restored by adjusting cache expiration times.
 
+**Root Cause and Resolution:**
+- **Root Cause:** The root cause was misconfigured caching settings on the web server. Cache expiration times were set too long, causing outdated content to be served and leading to slower response times.
+- **Resolution:** The issue was resolved by adjusting cache expiration times to ensure content freshness. Web Operations team also implemented automated cache invalidation mechanisms to reflect real-time updates accurately.
 
-## Incident Timeline
-**2018 October 21 22:52 UTC** - Because the database clusters in the US East and West Coast data centers now contained writes that were not present in the other data center, we were unable to fail the primary back over to the US East Coast data center safely.
+**Corrective and Preventative Measures:**
+- **Improvements/Fixes:**
+  - Implement a cache management strategy with optimal expiration times for different content types.
+  - Set up automated cache invalidation mechanisms to ensure content freshness.
+  - Enhance monitoring to track cache hit/miss ratios and response times.
+- **Tasks to Address Issue:**
+  - Review and adjust cache expiration settings for various content types.
+  - Develop and deploy automated cache invalidation mechanisms.
+  - Establish real-time monitoring of cache performance metrics.
 
-**2018 October 21 22:54 UTC** - By this point the responding team decided to manually lock our internal deployment tooling to prevent any additional changes from being introduced.
-**2018 October 21 23:13 UTC** - It was understood at this time that the problem affected multiple database clusters.
+This outage underscored the critical role of properly configured caching mechanisms in maintaining optimal web application performance. It highlighted the need for continuous monitoring and rapid response to user-reported issues.
 
-**2018 October 21 23:19 UTC** - We made an explicit choice to partially degrade site usability by pausing webhook delivery and GitHub Pages builds instead of jeopardizing data we had already received from users.
+Upon detection of the slowdown, our team initially focused on backend services and server resource utilization. However, the redirection of the issue to the Web Operations team allowed us to identify the misconfigured cache as the true root cause. The assumption that the issue stemmed from database performance and network latency led us astray in the initial stages of investigation.
 
-**2018 October 22 00:41 UTC** - A backup process for all affected MySQL clusters had been initiated by this time and engineers were monitoring progress.
+The misconfigured cache expiration settings were promptly rectified, ensuring that content remained fresh and up-to-date. Additionally, automated cache invalidation mechanisms were implemented to enhance the accuracy of real-time updates without sacrificing performance.
 
-**2018 October 22 06:51 UTC** -Our teams had identified ways to restore directly from the West Coast to overcome throughput restrictions caused by downloading from off-site storage and were increasingly confident that restoration was imminent, and the time left to establishing a healthy replication topology was dependent on how long it would take replication to catch up.
+To prevent similar incidents in the future, we plan to implement a cache management strategy that includes optimal expiration times for different content types. Automated cache invalidation mechanisms will be further developed and deployed to ensure content freshness while maintaining high response speeds. We will also implement enhanced monitoring to track cache hit/miss ratios and response times, allowing us to proactively address any deviations from the expected performance metrics.
 
-**2018 October 22 07:46 UTC** - We intended to send this communication out much sooner and will be ensuring we can publish updates in the future under these constraints
-
-### Root Cause and Resolution
- During our recovery, we captured the MySQL binary logs containing the writes we took in our primary site that were not replicated to our West Coast site from
-each affected cluster. The total number of writes that were not replicated to the West Coast was relatively small. For example, one of our busiest clusters had
-954 writes in the affected window. We are currently performing an analysis on these logs and determining which writes can be automatically reconciled and which will
-require outreach to users.
-
-### Corrective and Preventive Measures
-- Adjust the configuration of Orchestrator to prevent the promotion of database primaries across regional boundaries.
-- While many portions of GitHub were available throughout the incident, we were only able to set our status to green, yellow, and red.
-- tolerate the full failure of a single data center failure without user impact.
-- We will take a more proactive stance in testing our assumptions.
-
-### Conclusion
-We know how much you rely on GitHub for your projects and businesses to succeed. No one is more passionate about the availability of our services and the 
-correctness of your data. We will continue to analyze this event for opportunities to serve you better and earn the trust you place in us.
+In conclusion, this outage served as a valuable reminder of the pivotal role that caching mechanisms play in web application performance. By addressing the root cause and implementing the corrective and preventative measures outlined above, we are committed to delivering a consistently smooth and responsive user experience.
